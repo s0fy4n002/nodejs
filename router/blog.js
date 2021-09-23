@@ -1,28 +1,55 @@
 const BlogPost = require('../models/blog');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'public/images/')
+    },
+    filename: function (req, file, cb) {
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
+         "Agustus", "September", "Oktober", "November", "Desember"];
+        const tgl = new Date().getFullYear() + '-' + months[new Date().getMonth()] + '-'  + new Date().getDate(); 
+        
+        const uniqueSuffix = tgl + ' ' + file.originalname;
+        cb(null, uniqueSuffix)
+    }
+  })
+
+const uploads = multer({storage});
+
 
 function blog(app, cors, body, validationResult){
-    
+
 
     app.get('/post', (req, res, next) => {
-        console.log(req.body)
+        console.log(new Date().getUTCMonth());
         res.json({
             message: "Post Get"            
         })     
     })
 
-    app.post('/post', (req, res, next) => {
-
+    app.post('/post', uploads.single('image'), (req, res) => {
+        
+    
+        
         if(!req.body.title || !req.body.content){
             return res.status(400).json({
-                message: "Gagal",          
-                kesalahan: "data Ada yang kosong!"
+                kesalahan: "title / content kosong!"
             }) 
         }
 
+        if(!req.file){
+            console.log(req.file)
+            return res.status(400).json({
+                kesalahan: "image harus di upload"
+            }) 
+        }
+        
 
         const Posting = new BlogPost({
             title: req.body.title,
             content: req.body.content,
+            image: req.file.path,
             author: {
                 _id: 001,
                 nama: "Yayan",
@@ -31,6 +58,7 @@ function blog(app, cors, body, validationResult){
         })   
         Posting.save()
         .then( result => {
+
 
             res.status(201).json({
                 message: "berhasil",          
@@ -67,5 +95,7 @@ function blog(app, cors, body, validationResult){
     })
 
 }
+
+
 
 module.exports = blog
