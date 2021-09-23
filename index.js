@@ -1,36 +1,33 @@
-// const express = require('express');
-// const app  = express();
-// const router = express.Router();
-// const ejs = require('ejs');
-// const path = require('path');
-
-// app.use(express.json());
-// app.use(express.urlencoded({extended: true}));
-// app.use(express.static('public'));
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
-
-// app.get('/', (req, res)=>{
-//     res.render("page/index")
-// });
-
-// app.listen(3000, ()=> console.log("server up"));
+const express = require('express');
+const app  = express();
+const main = require('./router/index');
+const port = 8080;
+const favicon = require('serve-favicon');
+const path = require('path');
+const router = express.Router();
+const cors = require('cors');
 
 
-var http = require('http');
-var fs = require('fs')
+app.use(cors());
+app.use(express.static('public'))
+app.use(express.json());
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.set('views', path.join(__dirname, '/views'))
+app.set('view engine', 'ejs')
 
-const server = http.createServer((req, res) => {
-    fs.readFile('./views/page/index.ejs', (err, data)=>{
-        if(err){
-            res.writeHead(404);
-            res.write("Error: file tidak ditemukan!");
-        }else{
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.write(data);
-        }
-        res.end();
-    })
+app.all('/products', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
+
+
+
+main(app, cors)
+
+
+
+
+app.listen(port, () => {
+    console.log(`-_-\\http://localhost:${port}\\-_-\\`)
 })
-
-server.listen(8080, () => console.log('server running'))
