@@ -30,10 +30,6 @@ const fileFilter = (req, file, cb) => {
 }
 
 
-// app.use(multer({ storage: fileStorage, fileFilter: fileFilter}).single('image'));
-
-
-
 const dbString = `mongodb+srv://user002:jawabarat002@cluster0.frony.mongodb.net/pizza?retryWrites=true&w=majority`
 const dbOptions = {useNewUrlParser: true,useUnifiedTopology: true}
 const connection = mongoose.connect(dbString, dbOptions)
